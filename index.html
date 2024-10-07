@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>共有可能なプロジェクトマネジメント トレードオフスライダー</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .slider-container { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; }
+        input[type="range"] { width: 100%; }
+        #currentSettings { background-color: #f0f0f0; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+        #shareUrl { width: 100%; margin-bottom: 10px; }
+        button { padding: 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+    </style>
+</head>
+<body>
+    <h1>プロジェクトマネジメント トレードオフ</h1>
+    <div id="sliders"></div>
+    <div id="currentSettings">
+        <h3>現在の設定:</h3>
+        <ul id="settingsList"></ul>
+    </div>
+    <button onclick="generateShareUrl()">共有用URLを生成</button>
+    <input type="text" id="shareUrl" readonly>
+    <button onclick="copyShareUrl()">URLをコピー</button>
+
+    <script>
+        const factors = [
+            { key: 'budget', label: '予算内に収める（予算）' },
+            { key: 'scope', label: '機能を全部揃える（スコープ）' },
+            { key: 'time', label: '期日を死守する（時間）' },
+            { key: 'quality', label: '高い品質、少ない欠陥（品質）' }
+        ];
+
+        const levelLabels = ['低', '中低', '中', '中高', '高'];
+
+        function createSliders() {
+            const slidersContainer = document.getElementById('sliders');
+            factors.forEach(factor => {
+                const slider = document.createElement('div');
+                slider.className = 'slider-container';
+                slider.innerHTML = `
+                    <label for="${factor.key}">${factor.label}</label>
+                    <input type="range" id="${factor.key}" min="1" max="5" value="3" oninput="updateSettings()">
+                `;
+                slidersContainer.appendChild(slider);
+            });
+        }
+
+        function updateSettings() {
+            const settingsList = document.getElementById('settingsList');
+            settingsList.innerHTML = '';
+            factors.forEach(factor => {
+                const value = document.getElementById(factor.key).value;
+                const li = document.createElement('li');
+                li.textContent = `${factor.label}: ${levelLabels[value - 1]} (${value})`;
+                settingsList.appendChild(li);
+            });
+        }
+
+        function loadSettingsFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            factors.forEach(factor => {
+                const value = urlParams.get(factor.key);
+                if (value) {
+                    document.getElementById(factor.key).value = value;
+                }
+            });
+            updateSettings();
+        }
+
+        function generateShareUrl() {
+            const urlParams = new URLSearchParams();
+            factors.forEach(factor => {
+                urlParams.set(factor.key, document.getElementById(factor.key).value);
+            });
+            const shareUrl = `${window.location.origin}${window.location.pathname}?${urlParams.toString()}`;
+            document.getElementById('shareUrl').value = shareUrl;
+        }
+
+        function copyShareUrl() {
+            const shareUrlInput = document.getElementById('shareUrl');
+            shareUrlInput.select();
+            document.execCommand('copy');
+            alert('URLをクリップボードにコピーしました！');
+        }
+
+        createSliders();
+        loadSettingsFromUrl();
+        updateSettings();
+    </script>
+</body>
+</html>
