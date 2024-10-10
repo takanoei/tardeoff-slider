@@ -7,7 +7,7 @@
     <style>
         body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
         .slider-container { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 5px; }
+        .slider-labels { display: flex; justify-content: space-between; margin-top: 5px; font-size: 12px; }
         input[type="range"] { width: 100%; }
         #currentSettings { background-color: #f0f0f0; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
         #shareUrl { width: 100%; margin-bottom: 10px; }
@@ -28,13 +28,14 @@
 
     <script>
         const factors = [
-            { key: 'budget', label: '予算内に収める（予算）' },
-            { key: 'scope', label: '機能を全部揃える（スコープ）' },
-            { key: 'time', label: '期日を死守する（時間）' },
-            { key: 'quality', label: '高い品質、少ない欠陥（品質）' }
+    { key: 'budget', label: '予算' },
+    { key: 'core', label: 'コア機能を実装すること' },
+    { key: 'additional', label: '付加機能を実装すること' },
+    { key: 'bugs', label: 'バグを少なく' },
+    { key: 'uiux', label: 'UI/UX（デザイン、使い心地）' }
         ];
 
-        const levelLabels = ['低', '中低', '中', '中高', '高'];
+        const levelLabels = ['最低', '低', '中低', '中高', '高', '最高'];
 
         function createSliders() {
             const slidersContainer = document.getElementById('sliders');
@@ -42,13 +43,12 @@
                 const slider = document.createElement('div');
                 slider.className = 'slider-container';
                 slider.innerHTML = `
-                    <label for="${factor.key}">${factor.label}</label>
-                    <input type="range" id="${factor.key}" min="1" max="5" value="3" oninput="updateSettings()">
-                `;
-                slidersContainer.appendChild(slider);
-            });
-        }
-
+    <label for="${factor.key}">${factor.label}</label>
+    <input type="range" id="${factor.key}" min="1" max="6" value="3" oninput="updateSettings()">
+    <div class="slider-labels">
+        ${levelLabels.map(label => `<span>${label}</span>`).join('')}
+    </div>
+`;
         function updateSettings() {
             const settingsList = document.getElementById('settingsList');
             settingsList.innerHTML = '';
